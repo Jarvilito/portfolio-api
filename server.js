@@ -27,17 +27,17 @@ require("dotenv").config();
 
 // Passport config
 
-// require("./config/passport")(passport);
-// app.use(cors());
-// app.use(express.json());
+require("./config/passport")(passport);
+app.use(cors());
+app.use(express.json());
 
-// app.use(
-//   session({
-//     secret: "secret",
-//     resave: true,
-//     saveUnintialized: true,
-//   })
-// );
+app.use(
+  session({
+    secret: "secret",
+    resave: true,
+    saveUnintialized: true,
+  })
+);
 
 passport.serializeUser((user, cb) => {
   cb(null, user);
@@ -107,7 +107,7 @@ app.use(express.json());
 app.enable("trust proxy");
 //Passport middleware
 app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.session());
 
 app.get("/auth/facebook", passport.authenticate("facebook"));
 
