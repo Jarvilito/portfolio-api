@@ -12,13 +12,16 @@ const keys = require("./config/oauth");
 const chalk = require("chalk");
 let user = {};
 
-let localClientUrl = "http://localhost:3000/";
+const baseURL =
+  process.env.NODE_ENV === "production"
+    ? "https://webservice-api-jarvis-portfolio.onrender.com/"
+    : "http://localhost:5001/";
 
-// if (process.env.NODE_ENV === "development") {
-//   localClientUrl = "http://localhost:3000/";
-// } else {
-//   localClientUrl = "https://jarvis-tech-portfolio.firebaseapp.com/";
-// }
+
+const localClientUrl = process.env.NODE_ENV === "production"
+? "https://jarvis-tech-portfolio.web.app/"
+: "http://localhost:3000/";
+
 
 require("dotenv").config();
 
@@ -68,7 +71,7 @@ passport.use(
     {
       clientID: keys.GITHUB.clientID,
       clientSecret: keys.GITHUB.clientSecret,
-      callbackURL: `/auth/github/callback`,
+      callbackURL: `${baseURL}/auth/github/callback`,
     },
     (accessToken, refreshToken, profile, cb) => {
       console.log(chalk.blue(JSON.stringify(profile)));
@@ -84,7 +87,7 @@ passport.use(
     {
       clientID: keys.GOOGLE.clientID,
       clientSecret: keys.GOOGLE.clientSecret,
-      callbackURL: `/auth/google/callback`,
+      callbackURL: `${baseURL}/auth/google/callback`,
     },
     (accessToken, refreshToken, profile, cb) => {
       console.log(chalk.blue(JSON.stringify(profile)));
@@ -97,21 +100,6 @@ passport.use(
   )
 );
 
-// Instagram Strategy
-passport.use(
-  new InstagramStrategy(
-    {
-      clientID: keys.INSTAGRAM.clientID,
-      clientSecret: keys.INSTAGRAM.clientSecret,
-      callbackURL: `/auth/instagram/callback`,
-    },
-    (accessToken, refreshToken, profile, cb) => {
-      console.log(chalk.blue(JSON.stringify(profile)));
-      user = { ...profile };
-      return cb(null, profile);
-    }
-  )
-);
 
 const app = express();
 app.use(cors());
@@ -203,13 +191,13 @@ app.use("/timelines", timelineRouter);
 app.use("/comments", commentsRouter);
 app.use("/reply", replyRouter);
 
-// if (process.env.NODE_ENV === "production") {
-//   app.use(express.static("../build"));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../build")));
 
-//   app.get("*", (req, res) => {
-//     res.sendFile(path.resolve(__dirname, "build", "index.html"));
-//   });
-// }
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../build", "index.html"));
+  });
+}
 
 const port = process.env.PORT || 5001;
 
