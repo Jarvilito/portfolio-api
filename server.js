@@ -12,11 +12,13 @@ let user = {};
 
 require("dotenv").config();
 
+// Set the baseURL based on environment
 const baseURL =
   process.env.NODE_ENV === "production"
     ? "https://webservice-api-jarvis-portfolio.onrender.com"
     : "http://localhost:5001";
 
+// Set the local client URL for redirection
 const localClientUrl =
   process.env.NODE_ENV === "production"
     ? "https://jarvis-tech-portfolio.web.app/"
@@ -29,10 +31,11 @@ const corsOptions = {
     : "http://localhost:3000",
   credentials: true,
 };
+
+// Initialize express app
 const app = express();
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // Handle preflight requests
-
 app.use(express.json());
 app.enable("trust proxy");
 
@@ -94,10 +97,14 @@ passport.use(
   )
 );
 
-// Routes
+// Initialize Passport middleware
+app.use(passport.initialize());
+app.use(passport.session()); // Use sessions if needed
+
+// Routes for authentication
 app.get("/auth/facebook", passport.authenticate("facebook"));
 app.get(
-  `/auth/facebook/callback`,
+  "/auth/facebook/callback",
   passport.authenticate("facebook"),
   (req, res) => {
     res.redirect(localClientUrl);
@@ -106,7 +113,7 @@ app.get(
 
 app.get("/auth/github", passport.authenticate("github"));
 app.get(
-  `/auth/github/callback`,
+  "/auth/github/callback",
   passport.authenticate("github"),
   (req, res) => {
     res.redirect(localClientUrl);
@@ -118,24 +125,26 @@ app.get(
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 app.get(
-  `/auth/google/callback`,
+  "/auth/google/callback",
   passport.authenticate("google"),
   (req, res) => {
     res.redirect(localClientUrl);
   }
 );
 
+// Route to get user data
 app.get("/user", (req, res) => {
   res.send(user);
-  user = {};
+  user = {}; // Clear user after sending
 });
 
+// Route to log out
 app.get("/auth/logout", (req, res) => {
-  user = {};
+  user = {}; // Clear user data
   res.json("Log out success.");
 });
 
-// MongoDB connection
+// MongoDB connection setup
 const uri = "mongodb+srv://Admin:boGfE8g7gRNVH435@cluster0.r4qlg.mongodb.net/?retryWrites=true&w=majority";
 mongoose.connect(uri, {
   useNewUrlParser: true,
@@ -148,7 +157,7 @@ connection.once("open", () => {
   console.log("MongoDB database connection established successfully");
 });
 
-// Routers
+// Routers for different routes
 const exercisesRouter = require("./routes/exercises");
 const usersRouter = require("./routes/users");
 const skillsRouter = require("./routes/skills");
