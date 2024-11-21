@@ -3,42 +3,40 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const path = require("path");
 const passport = require("passport");
-const session = require("express-session");
 const FacebookStrategy = require("passport-facebook").Strategy;
-const InstagramStrategy = require("passport-instagram").Strategy;
 const GithubStrategy = require("passport-github").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const keys = require("./config/oauth");
 const chalk = require("chalk");
 let user = {};
 
+require("dotenv").config();
+
 const baseURL =
   process.env.NODE_ENV === "production"
     ? "https://webservice-api-jarvis-portfolio.onrender.com/"
     : "http://localhost:5001/";
 
+const localClientUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://jarvis-tech-portfolio.web.app/"
+    : "http://localhost:3000/";
 
-const localClientUrl = process.env.NODE_ENV === "production"
-? "https://jarvis-tech-portfolio.web.app/"
-: "http://localhost:3000/";
+// CORS configuration
+const corsOptions = {
+  origin: process.env.NODE_ENV === "production"
+    ? "https://jarvis-tech-portfolio.web.app"
+    : "http://localhost:3000",
+  credentials: true,
+};
+const app = express();
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight requests
 
-
-require("dotenv").config();
-
-// Passport config
-
-require("./config/passport")(passport);
-app.use(cors());
 app.use(express.json());
+app.enable("trust proxy");
 
-app.use(
-  session({
-    secret: "secret",
-    resave: true,
-    saveUnintialized: true,
-  })
-);
-
+// Passport configuration
 passport.serializeUser((user, cb) => {
   cb(null, user);
 });
@@ -56,9 +54,7 @@ passport.use(
       callbackURL: `/auth/facebook/callback`,
     },
     (accessToken, refreshToken, profile, cb) => {
-      console.log(chalk.blue(JSON.stringify(profile)));
       const picture = `https://graph.facebook.com/${profile.id}/picture?width=200&height=200&access_token=${accessToken}`;
-
       user = { ...profile, picture };
       return cb(null, profile);
     }
@@ -74,7 +70,6 @@ passport.use(
       callbackURL: `${baseURL}/auth/github/callback`,
     },
     (accessToken, refreshToken, profile, cb) => {
-      console.log(chalk.blue(JSON.stringify(profile)));
       user = { ...profile };
       return cb(null, profile);
     }
@@ -90,7 +85,6 @@ passport.use(
       callbackURL: `${baseURL}/auth/google/callback`,
     },
     (accessToken, refreshToken, profile, cb) => {
-      console.log(chalk.blue(JSON.stringify(profile)));
       const picture = profile.photos
         ? profile.photos[0].value
         : "/img/faces/unknown-user-pic.jpg";
@@ -100,17 +94,8 @@ passport.use(
   )
 );
 
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.enable("trust proxy");
-//Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
+// Routes
 app.get("/auth/facebook", passport.authenticate("facebook"));
-
 app.get(
   `/auth/facebook/callback`,
   passport.authenticate("facebook"),
@@ -130,9 +115,7 @@ app.get(
 
 app.get(
   "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 app.get(
   `/auth/google/callback`,
@@ -142,29 +125,17 @@ app.get(
   }
 );
 
-// app.get("/auth/instagram", passport.authenticate("instagram"));
-// app.get(
-//   `${process.env.BASE_URL}/auth/instagram/callback`,
-//   passport.authenticate("instagram"),
-//   (req, res) => {
-//     res.redirect(localClientUrl);
-//   }
-// );
-
 app.get("/user", (req, res) => {
-  console.log("getting user data!");
-  console.log(process.env.NODE_ENV);
   res.send(user);
   user = {};
 });
 
 app.get("/auth/logout", (req, res) => {
-  console.log("logging out!");
-
   user = {};
   res.json("Log out success.");
 });
 
+// MongoDB connection
 const uri = "mongodb+srv://Admin:boGfE8g7gRNVH435@cluster0.r4qlg.mongodb.net/?retryWrites=true&w=majority";
 mongoose.connect(uri, {
   useNewUrlParser: true,
@@ -177,6 +148,7 @@ connection.once("open", () => {
   console.log("MongoDB database connection established successfully");
 });
 
+// Routers
 const exercisesRouter = require("./routes/exercises");
 const usersRouter = require("./routes/users");
 const skillsRouter = require("./routes/skills");
@@ -191,16 +163,16 @@ app.use("/timelines", timelineRouter);
 app.use("/comments", commentsRouter);
 app.use("/reply", replyRouter);
 
+// Production setup for serving frontend
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../build")));
-
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../build", "index.html"));
   });
 }
 
+// Start the server
 const port = process.env.PORT || 5001;
-
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
