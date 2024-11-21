@@ -14,8 +14,8 @@ require("dotenv").config();
 
 const baseURL =
   process.env.NODE_ENV === "production"
-    ? "https://webservice-api-jarvis-portfolio.onrender.com/"
-    : "http://localhost:5001/";
+    ? "https://webservice-api-jarvis-portfolio.onrender.com"
+    : "http://localhost:5001";
 
 const localClientUrl =
   process.env.NODE_ENV === "production"
@@ -51,7 +51,7 @@ passport.use(
     {
       clientID: keys.FACEBOOK.clientID,
       clientSecret: keys.FACEBOOK.clientSecret,
-      callbackURL: `/auth/facebook/callback`,
+      callbackURL: `${baseURL}/auth/facebook/callback`,
     },
     (accessToken, refreshToken, profile, cb) => {
       const picture = `https://graph.facebook.com/${profile.id}/picture?width=200&height=200&access_token=${accessToken}`;
