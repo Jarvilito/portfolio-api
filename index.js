@@ -1,3 +1,9 @@
+// **** DO NOT USE THIS FILE ****
+// **** WE DONT USE THIS ANYMORE ****
+// **** IF YOU WILL UPDATE SOMETHING, EVERYTHING SHOULD BE UPDATED INSIDE FUNCTIONS FOLDER ****
+// **** TO TEST GO INSTALL FIRST (firebase init emulators) ******
+// **** THEN (firebase emulators:start --only functions) ****
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -7,7 +13,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const GithubStrategy = require('passport-github').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const functions = require('firebase-functions');
-const keys = require('./config/oauth');
+const keys = require('./functions/config/oauth');
 const chalk = require('chalk');
 let user = {};
 
