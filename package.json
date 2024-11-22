@@ -1,31 +1,35 @@
 {
-  "name": "portfolio-be",
-  "version": "1.0.0",
-  "description": "portfolio api",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Jarvis Palad",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.18.2",
-    "bcrypt": "^4.0.1",
-    "bcryptjs": "^2.4.3",
-    "browserify": "^16.5.1",
-    "chalk": "^4.0.0",
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "envify": "^4.1.0",
-    "express-enforces-ssl": "^1.1.0",
-    "express-session": "^1.17.1",
-    "mongoose": "^5.9.10",
-    "passport": "^0.4.1",
-    "passport-facebook": "^3.0.0",
-    "passport-github": "^1.1.0",
-    "passport-google-oauth20": "^2.0.0",
-    "passport-instagram": "^1.0.0",
-    "passport-local": "^1.0.0",
-    "passport-twitter": "^1.0.4"
-  }
+	"name": "portfolio-be",
+	"version": "1.0.0",
+	"description": "portfolio api",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"deploy": "firebase deploy --only functions"
+	},
+	"author": "Jarvis Palad",
+	"license": "ISC",
+	"dependencies": {
+		"bcrypt": "^4.0.1",
+		"bcryptjs": "^2.4.3",
+		"browserify": "^16.5.1",
+		"chalk": "^4.0.0",
+		"cors": "^2.8.5",
+		"dotenv": "^8.2.0",
+		"envify": "^4.1.0",
+		"express": "^4.18.2",
+		"express-enforces-ssl": "^1.1.0",
+		"express-session": "^1.17.1",
+		"firebase": "^11.0.2",
+		"firebase-admin": "^13.0.1",
+		"firebase-functions": "^6.1.1",
+		"mongoose": "^5.9.10",
+		"passport": "^0.4.1",
+		"passport-facebook": "^3.0.0",
+		"passport-github": "^1.1.0",
+		"passport-google-oauth20": "^2.0.0",
+		"passport-instagram": "^1.0.0",
+		"passport-local": "^1.0.0",
+		"passport-twitter": "^1.0.4"
+	}
 }
